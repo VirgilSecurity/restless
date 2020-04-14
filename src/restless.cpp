@@ -119,8 +119,16 @@ Handle::response Handle::exec() {
         return result;
 }
 
+void Handle::setCA() {
+    if (0 != customCA.length()) {
+        curl_easy_setopt(curl.get(), CURLOPT_CAINFO, customCA.c_str());
+    }
+}
+
 Handle::response Handle::execGet() {
         response res;
+        // Set custom CA if present
+        setCA();
         // Write callback function
         curl_easy_setopt(curl.get(), CURLOPT_WRITEFUNCTION, write_callback);
         curl_easy_setopt(curl.get(), CURLOPT_WRITEDATA, &res);
@@ -159,6 +167,8 @@ Handle::response Handle::execPost() {
         // This will also make the library use a
         // "Content-Type: application/x-www-form-urlencoded" header.
         curl_easy_setopt(curl.get(), CURLOPT_POST, 1L);
+        // Set custom CA if present
+        setCA();
         // Set post fields and post field size
         if (!post_content.empty()) {
                 curl_easy_setopt(curl.get(), CURLOPT_POSTFIELDS,
@@ -228,6 +238,9 @@ Handle::response Handle::execPut() {
         curl_easy_setopt(curl.get(), CURLOPT_PUT, 1L);
         curl_easy_setopt(curl.get(), CURLOPT_UPLOAD, 1L);
 
+        // Set custom CA if present
+        setCA();
+
         // set read callback function
         curl_easy_setopt(curl.get(), CURLOPT_READFUNCTION, read_callback);
         // set data object to pass to callback function
@@ -282,6 +295,9 @@ Handle::response Handle::execDel() {
         // Write callback function
         curl_easy_setopt(curl.get(), CURLOPT_WRITEFUNCTION, write_callback);
         curl_easy_setopt(curl.get(), CURLOPT_WRITEDATA, &res);
+
+        // Set custom CA if present
+        setCA();
 
         // Set post fields and post field size
         if (!post_content.empty()) {
@@ -388,6 +404,10 @@ size_t Handle::read_callback(void *data, size_t size, size_t nmemb,
         up_obj->data += copy_size;
         // return copied size
         return copy_size;
+}
+
+void Handle::setCA(const std::string ca) {
+    customCA = ca;
 }
 
 }  // namespace asoni ends here

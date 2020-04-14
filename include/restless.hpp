@@ -25,6 +25,9 @@ private:
 
     Request_Type method;
 
+    // Custom CA bundle
+    std::string customCA;
+
     // Request URI
     std::string URI;
 
@@ -61,6 +64,8 @@ private:
         const char* data;
         size_t length;
     };
+
+    void setCA();
 
     response execGet();
 
@@ -124,5 +129,7 @@ public:
     Handle &timeout(long timeout);
 
     response exec();
+
+    void setCA(const std::string ca);
 };
 } // Namespace asoni ends
